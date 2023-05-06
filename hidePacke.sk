@@ -1,8 +1,8 @@
 import:
-	com.comphenix.protocol.ProtocolLibrary
-	com.comphenix.protocol.PacketType
-	com.comphenix.protocol.events.PacketContainer
-	it.unimi.dsi.fastutil.ints.IntArrayList
+    com.comphenix.protocol.ProtocolLibrary
+    com.comphenix.protocol.PacketType
+    com.comphenix.protocol.events.PacketContainer
+    it.unimi.dsi.fastutil.ints.IntArrayList
 
 
 # packet to hide entity on the server
