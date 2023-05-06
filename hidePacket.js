@@ -1,0 +1,19 @@
+import:
+	com.comphenix.protocol.ProtocolLibrary
+	com.comphenix.protocol.PacketType
+	com.comphenix.protocol.events.PacketContainer
+	it.unimi.dsi.fastutil.ints.IntArrayList
+
+
+# packet to hide entity on the server
+# entitys can be shown back, when reloading the chunk
+
+
+function hideEntityPacket(players:players,entity:entity):
+	set {_packet} to new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY)     # Registers the Packet we want to send 
+	{_packet}.getModifier().write(0, new IntArrayList([{_entity}.getEntityId()]))   
+  loop {_players::*}:                                                             # loops the players the packet should be send too
+	  getProtocolManager().sendServerPacket(loop-value, {_packet})                  # sends the packet to the loop-players
+    
+    
+# Example Usage: hideEntityPacket(all players, armor stand)
