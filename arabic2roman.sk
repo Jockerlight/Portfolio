@@ -1,0 +1,8 @@
+function a2r(number: number) :: string:
+	set {_roman::*} to "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV" and "I"
+	set {_arab::*} to 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4 and 1
+	loop {_arab::*}:
+		loop {_number} / loop-value times:
+			set {_output} to join {_output} and {_roman::%loop-index-1%}
+			subtract loop-value-1 from {_number}
+	return {_output}
