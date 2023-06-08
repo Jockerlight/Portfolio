@@ -1,0 +1,45 @@
+import:
+	org.bukkit.Location
+	org.bukkit.block.BlockFace
+	org.bukkit.util.Vector
+
+
+function spawnPet(p: player, name: text, helemt: item):
+    spawn armor stand at ({_p}'s location ~ vector(1.5, 1,0)) with nbt (nbt compound from "{Invisible:1b,Invulnerable:1b,NoBasePlate:1b,NoGravity:1b,Small:1b,Marker:1}")
+    set {_as} to last spawned armor stand
+    set helmet of {_as} to {_helemt} 
+    set metadata value "pet" of {_p} to {_as}
+    while metadata value "pet" of {_p} = {_as}:
+        set {_targetLoc} to ({_p}.getLocation().getDirection().multiply(new Vector(-1, 0, -1)).normalize())
+        moveSmoothly({_as}, {_as}'s location,  {_p}.getLocation().add({_targetLoc}))
+        wait 1 second
+
+
+function addPetXP(compound: nbt compound, am: integer,p: player):
+	set {_xp} to int tag "custom;xp" of {_compound}
+	set tag "custom;xp" of {_compound} to ({_xp} + {_am})
+	checkPetLevel({_compound}, {_p})
+
+
+function moveSmoothly(e: entity, start: location, end: location):
+    set {_v} to vector from {_start} to {_end}
+    set {_increment} to vector length of {_v} / 20
+    set vector length of {_v} to {_increment}
+    loop 20 times:
+        teleport {_e} to {_start} ~ {_v}
+        wait 1 tick 
+        set vector length of {_v} to {_increment} + vector length of {_v}
+
+function checkPetLevel(compound: nbt compound,p: player):
+    set {_xp} to double tag "custom;xp" of {_compound} 
+    set {_maxxp} to double tag "custom;maxxp" of {_compound} 
+    set {_level} to int tag "custom;Level" of {_compound} 
+    set {_maxlevel} to int tag "custom;MaxLevel" of {_compound} 
+    if {_level} < {_maxlevel}:
+        if {_xp} >= {_maxxp}:
+            set tag "custom;Level" of {_compound} to ({_level} + 1)
+            set double tag "custom;xp" of {_compound} to 0
+            set double tag "custom;maxxp" of {_compound} to (round({_level}*25*2^(({_level}/10+1)/2)))
+            send title "&c&lPET LEVEL" with subtitle "&7You pet leveled up to level %{_level}%" to {_p}
+        
+    
