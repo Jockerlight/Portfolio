@@ -1,0 +1,43 @@
+import:
+	com.comphenix.protocol.ProtocolLib
+	com.comphenix.protocol.ProtocolLibrary
+	com.comphenix.protocol.injector.PacketConstructor
+	com.comphenix.protocol.PacketType
+	com.comphenix.protocol.wrappers.BlockPosition
+	com.comphenix.protocol.ProtocolManager
+	java.util.Random
+	java.lang.Integer
+	org.bukkit.Effect
+
+on load:
+	set {-protocolManager} to ProtocolLibrary.getProtocolManager()
+
+
+function getProtocolManager() :: object:
+    return {-protocolManager}
+	
+function packets_blockBreakAnimation(players: players, loc: location, stage: number, id: number):
+    if {_id} is not set:
+        set {_i} to new Random().nextInt(2100000)
+    else:
+        set {_i} to Integer.parseInt("%{_id}%")
+    set {_pos} to new BlockPosition({_loc}.getBlockX(), {_loc}.getBlockY(), {_loc}.getBlockZ())
+    set {_packet} to getProtocolManager().createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION)
+    {_packet}.getBlockPositionModifier().write(0, {_pos})
+    {_packet}.getIntegers().write(0, {_i}) # Entity ID
+    {_packet}.getIntegers().write(1, Integer.parseInt("%{_stage}%")) # Stage
+    loop {_players::*}:
+        getProtocolManager().sendServerPacket(loop-value, {_packet})
+	
+	
+on arm swing:
+	player's gamemode = survival
+	stop if distance between player and player's exact target block > 7
+	set {_loc} to location of target block
+	set {_compound} to nbt compound of target block
+	mining(player,{_loc},{_compound})
+	
+	
+function breakBlockAnimation(loc: location):
+	set {_m} to (type of block at {_loc}).getMaterial()
+	{_loc}.getWorld().playEffect({_loc}, Effect.STEP_SOUND, {_m}, 10)	
