@@ -47,6 +47,7 @@ on arm swing:
 	stop if distance between player and player's target block > 5
 	metadata tag "verify" of player is player's target block
 	if target block of player is stone:
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 2, -1, true, false, false))
 		set {_loc} to location of target block
 		set {_compound} to nbt compound of target block
 		mining(player,{_loc},{_compound})
