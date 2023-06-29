@@ -1,0 +1,12 @@
+function Line(start:location, end:location) :: locations:
+    set {_locations} to (distance between {_start} and {_end})
+    set {_vector} to (vector from {_start} to {_end}) // vector {_locations},{_locations},{_locations}
+    loop {_locations} times:
+        set {_locations::%loop-number%} to {_start} offset by {_vector} ** vector loop-number, loop-number, loop-number
+    return {_locations::*}
+
+effect draw line from %location% to %location%:
+    trigger:
+        set {_locations::*} to Line(expr-1, expr-2)
+        loop {_locations::*}:
+            draw 1 of dust_color_transition using dustTransition(blue, green, 3) at (loop-value)
