@@ -51,6 +51,34 @@ on arm swing:
 		set {_compound} to nbt compound of target block
 		mining(player,{_loc},{_compound})
 
+function mining(p: player, loc: location, compound: nbt compound):
+	set {_u} to uuid of {_p}
+	set {_blockMine} to block at location of {_loc}
+	add 1 to {miningID} if (metadata value "ID" of {_blockMine}) is not set
+	set (metadata value "ID" of {_blockMine}) to {miningID} if (metadata value "ID" of {_blockMine}) is not set
+	getBlockMax({_blockMine})
+	set {_currenthp} to metadata value "blockID" of {_blockMine}
+	add (int tag "custom;power" of nbt compound of {_p}'s tool) ? 0.5 to {_currenthp}
+	set (metadata value "blockID" of {_blockMine}) to {_currenthp}
+	set {_max} to int tag "custom;blockHealth" of {_compound}
+	set {_stage} to floor(((100*({_currenthp}/{_max})) * 0.1))
+	packets_blockBreakAnimation(players, {_blockMine}, {_stage}, metadata value "ID" of {_blockMine})
+	if {_stage} >= 10:
+		breakBlockAnimation({_blockMine})
+		delete metadata value "blockID" of {_blockMine}
+		set block at location of {_blockMine} to air 
+		clear all potion effects of {_p}
+		delete int tag "custom;blockHealth" of {_compound}
+	wait 1 tick
+
+function getBlockMax(b:block):
+	set {_block::*} to stone,cobblestone
+	set {_values::*} to 20,30
+	loop {_block::*}:
+		if {_b} = loop-value:
+			set tag "custom;blockHealth" of nbt compound of {_b} to {_values::%loop-index%}
+		else:
+			exit loop
 
 function breakBlockAnimation(loc: location):
 	set {_m} to (type of block at {_loc}).getMaterial()
