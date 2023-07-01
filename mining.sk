@@ -62,7 +62,7 @@ function mining(p: player, loc: location, compound: nbt compound):
 	add (int tag "custom;power" of nbt compound of {_p}'s tool) ? 0.5 to {_currenthp}
 	set (metadata value "blockID" of {_blockMine}) to {_currenthp}
 	set {_max} to int tag "custom;blockHealth" of {_compound}
-	set {_stage} to floor(((100*({_currenthp}/{_max})) * 0.1))
+	set {_stage} to round(((100*({_currenthp}/{_max})) * 0.1))
 	packets_blockBreakAnimation(players, {_blockMine}, {_stage}, metadata value "ID" of {_blockMine})
 	if {_stage} >= 10:
 		breakBlockAnimation({_blockMine})
