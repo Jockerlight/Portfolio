@@ -1,0 +1,25 @@
+import:
+	net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation 
+	net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy 
+	net.minecraft.core.BlockPosition
+	java.util.Random
+	it.unimi.dsi.fastutil.ints.IntArrayList
+	java.lang.Integer
+
+
+function createMiningState(id: number, location: location, stage: number, players: players):
+	if {_id} is not set:
+		set {_id} to new Random().nextInt(2100000)
+	else:
+		set {_i} to Integer.parseInt("%{_id}%")
+	set {_blockposition} to new BlockPosition({_location}.getBlockX(), {_location}.getBlockY(), {_location}.getBlockZ())
+	set {_packet} to new PacketPlayOutBlockBreakAnimation({_id}, {_blockposition}, Integer.parseInt("%{_stage}%"))
+	loop {_players::*}:
+		loop-value.getHandle().b.a({_packet})
+	
+function hideEntity(players: players, entity: entity):
+	set {_ids::*} to new IntArrayList([{_entity}.getEntityId()])
+	set {_packet} to new PacketPlayOutEntityDestroy({_ids::*})
+	loop {_players::*}:
+		loop-value.getHandle().b.a({_packet})
+	
