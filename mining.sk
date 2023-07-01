@@ -1,35 +1,20 @@
 import:
-	com.comphenix.protocol.ProtocolLib
-	com.comphenix.protocol.ProtocolLibrary
-	com.comphenix.protocol.injector.PacketConstructor
-	com.comphenix.protocol.PacketType
-	com.comphenix.protocol.wrappers.BlockPosition
-	org.bukkit.event.block.BlockDamageAbortEvent
-	com.comphenix.protocol.ProtocolManager
+	net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation 
+	net.minecraft.core.BlockPosition
 	java.util.Random
+	it.unimi.dsi.fastutil.ints.IntArrayList
 	java.lang.Integer
-	org.bukkit.Effect
-
-on load:
-	set {-protocolManager} to ProtocolLibrary.getProtocolManager()
 
 
-function getProtocolManager() :: object:
-	return {-protocolManager}
-	
-function packets_blockBreakAnimation(players: players, loc: location, stage: number, id: number):
+function createMiningState(id: number, location: location, stage: number, players: players):
 	if {_id} is not set:
-		set {_i} to new Random().nextInt(2100000)
+		set {_id} to new Random().nextInt(2100000)
 	else:
 		set {_i} to Integer.parseInt("%{_id}%")
-	set {_pos} to new BlockPosition({_loc}.getBlockX(), {_loc}.getBlockY(), {_loc}.getBlockZ())
-	set {_packet} to getProtocolManager().createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION)
-	{_packet}.getBlockPositionModifier().write(0, {_pos})
-	{_packet}.getIntegers().write(0, {_i}) 
-	if {_stage} <= 10:
-		{_packet}.getIntegers().write(1, Integer.parseInt("%{_stage}%")) 
-		loop {_players::*}:
-			getProtocolManager().sendServerPacket(loop-value, {_packet})
+	set {_blockposition} to new BlockPosition({_location}.getBlockX(), {_location}.getBlockY(), {_location}.getBlockZ())
+	set {_packet} to new PacketPlayOutBlockBreakAnimation({_id}, {_blockposition}, Integer.parseInt("%{_stage}%"))
+	loop {_players::*}:
+		loop-value.getHandle().b.a({_packet})
 	
 	
 	
@@ -63,7 +48,7 @@ function mining(p: player, loc: location, compound: nbt compound):
 	set (metadata value "blockID" of {_blockMine}) to {_currenthp}
 	set {_max} to int tag "custom;blockHealth" of {_compound}
 	set {_stage} to round(((100*({_currenthp}/{_max})) * 0.1))
-	packets_blockBreakAnimation(players, {_blockMine}, {_stage}, metadata value "ID" of {_blockMine})
+	createMiningState(metadata value "ID" of {_blockMine}, {_loc}, {_stage}, player)
 	if {_stage} >= 10:
 		breakBlockAnimation({_blockMine})
 		delete metadata value "blockID" of {_blockMine}
