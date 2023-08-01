@@ -1,0 +1,28 @@
+import:
+    net.luckperms.api.LuckPerms
+    net.luckperms.api.model.user.User
+    net.luckperms.api.LuckPermsProvider
+    net.luckperms.api.node.Node
+    net.luckperms.api.node.NodeType
+    net.luckperms.api.node.NodeBuilder
+    java.util.UUID
+
+on load:
+	set {luckInstance} to LuckPermsProvider.get()
+
+function userGetPrefix(player: player) :: string:
+	set {_user} to {luckInstance}.getPlayerAdapter(Player.class).getUser({_player})
+	set {_prefix} to {_user}.getCachedData().getMetaData().getPrefix()
+	return colored {_prefix}
+ 
+function userGetGroup(player: player) :: string:
+	set {_user} to {luckInstance}.getPlayerAdapter(Player.class).getUser({_player})
+	loop ...{_user}.getNodes().stream():
+		set {_group} to (loop-value).getKey()
+	return {_group}
+        
+        
+function userAddPermission(player: player, permission: string):
+	set {_user} to {luckInstance}.getPlayerAdapter(Player.class).getUser({_player})
+	{_user}.add(Node.builder({_permission}).build())
+	{luckInstance}.getUserManager().saveUser({_user})
